@@ -11,25 +11,42 @@ exports.LoadUtils = () => {
 
     window.WWebJS.sendSeen = async (chatId) => {
         const chat = await window.WWebJS.getChat(chatId, { getAsModel: false });
-        if(chat) {
+        // if(chat) {
             
-            window.Store.WAWebStreamModel.Stream.markAvailable();
-            // await window.Store.SendSeen.markSeen(chat);
-            await window.Store.SendSeen.sendSeen({
-                chat: chat,
-                threadId: undefined
-            });
-            // if (window.compareWwebVersions(window.Debug.VERSION, "<=", "2.3000.1031980585")) {
-            //     await window.Store.SendSeen.sendSeen(chat);
-            // } else {
-            //     await window.Store.SendSeen.sendSeen({
-            //         chat: chat,
-            //         threadId: undefined
-            //     });
-            // }
+        //     window.Store.WAWebStreamModel.Stream.markAvailable();
+        //     // await window.Store.SendSeen.markSeen(chat);
+        //     await window.Store.SendSeen.sendSeen({
+        //         chat: chat,
+        //         threadId: undefined
+        //     });
+        //     // if (window.compareWwebVersions(window.Debug.VERSION, "<=", "2.3000.1031980585")) {
+        //     //     await window.Store.SendSeen.sendSeen(chat);
+        //     // } else {
+        //     //     await window.Store.SendSeen.sendSeen({
+        //     //         chat: chat,
+        //     //         threadId: undefined
+        //     //     });
+        //     // }
             
-            window.Store.WAWebStreamModel.Stream.markUnavailable();
-            return true;
+        //     window.Store.WAWebStreamModel.Stream.markUnavailable();
+        //     return true;
+        // }
+        if (chat) {
+            try {
+                window.Store.WAWebStreamModel.Stream.markAvailable();
+                await window.Store.SendSeen.sendSeen({
+                    chat: chat,
+                    threadId: undefined
+                });
+                window.Store.WAWebStreamModel.Stream.markUnavailable();
+                return true;
+            } catch (error) {
+                window.Store.WAWebStreamModel.Stream.markUnavailable();
+                if (error.name === 'TypeError' || error.message?.includes('markedUnread')) {
+                    return true;
+                }
+                throw error;
+            }
         }
         return false;
     };
